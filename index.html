@@ -458,7 +458,7 @@ var WORKS = {
     {
       title: "Gilberto",
       detail: true,
-      cover: "https://amalayar.github.io/amalayar/portadas/gilberto-portada.jpg"
+      cover: "portadas/gilberto-portada.jpg",
       sc_url: "https://soundcloud.com/amalayar/gilberto",
       bc_url: "https://amalayar.bandcamp.com/track/gilberto"
     }
@@ -614,7 +614,7 @@ function openDetail(section, idx) {
 
   var coverEl = document.getElementById('detail-cover');
   if (w.cover) {
-    coverEl.src = w.cover;
+    coverEl.src = '/amalayar/' + w.cover;
     coverEl.alt = w.title;
     coverEl.style.display = 'block';
   } else {
