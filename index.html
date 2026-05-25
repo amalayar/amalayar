@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sara Ramírez Márquez</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ff:'Libre Baskerville',Georgia,serif;
+  --sz:13.5px;
+  --gap:3.5rem;
+  --left:170px;
+}
+html,body{font-family:var(--ff);font-size:var(--sz);background:#fff;color:#111;min-height:100vh;-webkit-font-smoothing:antialiased}
+.site{display:grid;grid-template-columns:var(--left) 1fr;min-height:100vh;padding:2.6rem 2.8rem 2.6rem 2.6rem;gap:var(--gap)}
+aside{display:flex;flex-direction:column}
+.site-name{font-size:var(--sz);font-weight:400;line-height:1.3;margin-bottom:2.4rem;cursor:pointer;color:#111}
+nav{display:flex;flex-direction:column;gap:.55rem}
+nav button{font-family:var(--ff);font-size:var(--sz);font-weight:400;color:#111;background:none;border:none;padding:0;text-align:left;cursor:pointer;line-height:1.4;opacity:.45;transition:opacity .15s}
+nav button:hover{opacity:.7}
+nav button.active{opacity:1;font-weight:700}
+.content{}
+.view{display:none}
+.view.active{display:block}
+
+/* ── FLOWING TITLES ── */
+.flow{line-height:1.9}
+.flow-item{display:inline;font-size:var(--sz);font-weight:400;color:#111}
+.flow-item.clickable{cursor:pointer;border-bottom:1px solid transparent;transition:border-color .15s}
+.flow-item.clickable:hover{border-bottom-color:#aaa}
+.flow-item a{color:#111;text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s}
+.flow-item a:hover{border-bottom-color:#aaa}
+.flow-sep{display:inline;color:#ccc;margin:0 .6rem;user-select:none}
+
+/* ── DETAIL PAGE ── */
+#view-detail{animation:rise .35s ease both}
+.detail-back{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:#999;background:none;border:none;padding:0;cursor:pointer;margin-bottom:3rem;display:inline-flex;align-items:center;gap:.5rem;transition:color .15s}
+.detail-back:hover{color:#111}
+.detail-back::before{content:'←';font-size:.8rem}
+.detail-title{font-size:clamp(1.2rem,3vw,2rem);font-weight:400;margin-bottom:2rem}
+.detail-cover{max-width:420px;width:100%;height:auto;display:block;margin-bottom:2rem}
+.detail-film-year{font-size:var(--sz);color:#999;margin-left:.5rem}
+.pdf-wrap{margin-top:1.5rem;width:100%;max-width:780px;border:1px solid #e8e8e8}
+.pdf-wrap + .detail-score-note{margin-top:2.5rem}
+/* ── VIDEO ── */
+.video-wrap{position:relative;width:100%;max-width:700px;padding-top:56.25%;margin-top:1rem}
+.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+/* ── EVENTS ── */
+.ev-list{max-width:660px}
+.ev-row{display:grid;grid-template-columns:7rem 1fr;gap:1rem;padding:1.1rem 0;border-bottom:1px solid #eee}
+.ev-row:first-child{border-top:1px solid #eee}
+.ev-date{font-size:11px;color:#999;letter-spacing:.04em;padding-top:.15rem;line-height:1.5}
+.ev-body{display:flex;flex-direction:column;gap:.2rem}
+.ev-name{font-size:var(--sz);font-weight:400;line-height:1.4}
+.ev-name a{color:#111;text-decoration:none;border-bottom:1px solid #ddd;transition:border-color .15s}
+.ev-name a:hover{border-bottom-color:#888}
+.ev-venue{font-size:11.5px;color:#888;line-height:1.4}
+.ev-work{font-size:11.5px;color:#555;line-height:1.4}
+.map-wrap{width:100%;max-width:700px;height:55vh;margin-top:1rem}
+.map-places{margin-top:2rem;max-width:700px;columns:2;gap:3rem;font-size:12px;color:#555;line-height:1.9}
+.map-country{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#111;font-weight:700;display:block;margin-top:1.2rem}
+.map-country:first-child{margin-top:0}
+.pdf-viewer{display:block;width:100%;height:78vh;border:none}
+.detail-sc-link{font-size:var(--sz);font-weight:700;color:#111;text-decoration:none;border-bottom:1px solid #ccc;transition:border-color .15s;display:inline-block}
+.detail-sc-link:hover{border-bottom-color:#111}
+.detail-links{display:flex;flex-direction:column;align-items:flex-start;gap:.5rem;margin-top:.5rem}
+
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── DISCOGRAPHY GALLERY ── */
+.disc-gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:3rem;max-width:780px}
+.disc-card{display:flex;flex-direction:column;gap:.9rem}
+.disc-cover{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.disc-info{display:flex;flex-direction:column;gap:.25rem}
+.disc-title-text{font-size:var(--sz);font-weight:400;line-height:1.4}
+.disc-year-text{font-size:11.5px;color:#999}
+.disc-player{border:0;width:100%;height:42px;display:block}
+@media(max-width:600px){.disc-gallery{grid-template-columns:1fr;gap:2.5rem}}
+
+/* ── BIOGRAPHY ── */
+.bio-text{max-width:540px;line-height:1.85;color:#222}
+.bio-text p+p{margin-top:1.2rem}
+
+/* ── CONTACT ── */
+.contact-row{display:flex;gap:2.5rem;padding:.5rem 0;line-height:1.6;border-bottom:1px solid #eee}
+.contact-row:first-child{border-top:1px solid #eee}
+.c-key{color:#999;min-width:110px;font-size:12px;padding-top:.15rem}
+.c-val a{color:#111;text-decoration:none;border-bottom:1px solid #ddd;transition:border-color .15s}
+.c-val a:hover{border-bottom-color:#888}
+
+/* ── MOBILE ── */
+@media(max-width:680px){:root{--left:130px;--gap:2rem}.site{padding:2rem 1.5rem}}
+@media(max-width:480px){.site{grid-template-columns:1fr;gap:0}aside{margin-bottom:2rem}nav{flex-direction:row;flex-wrap:wrap;gap:.4rem 1.2rem}.site-name{margin-bottom:1rem}}
+</style>
+</head>
+<body>
+<div class="site">
+
+  <aside>
+    <div class="site-name" onclick="show('electroacoustic')">sara ramírez<br>márquez</div>
+    <nav>
+      <button onclick="show('electroacoustic')">electroacoustic</button>
+      <button onclick="show('contemporary')">contemporary</button>
+      <button onclick="show('film')">film</button>
+      <button onclick="show('discography')">discography</button>
+      <button onclick="show('biography')">biography</button>
+      <button onclick="show('events')">events</button>
+      <button onclick="show('contact')">contact</button>
+      <button onclick="show('other')">other</button>
+    </nav>
+  </aside>
+
+  <main class="content">
+
+    <!-- ELECTROACOUSTIC -->
+    <div class="view" id="view-electroacoustic">
+      <div class="flow" id="flow-electroacoustic"></div>
+    </div>
+
+    <!-- DETAIL (subpágina de obra) -->
+    <div class="view" id="view-detail">
+      <button class="detail-back" id="detail-back">Back</button>
+      <h2 class="detail-title" id="detail-title"></h2>
+      <img class="detail-cover" id="detail-cover" src="" alt="" style="display:none">
+      <div class="detail-embed-wrap" id="detail-embed"></div>
+    </div>
+
+    <!-- CONTEMPORARY -->
+    <div class="view" id="view-contemporary">
+      <div class="flow" id="flow-contemporary"></div>
+    </div>
+
+    <!-- FILM -->
+    <div class="view" id="view-film">
+      <div class="flow" id="flow-film"></div>
+    </div>
+
+    <!-- DISCOGRAPHY -->
+    <div class="view" id="view-discography">
+      <div class="disc-gallery">
+
+        <div class="disc-card">
+          <img class="disc-cover" src="portadas/disc-bangkok.jpg" alt="The City Below My Window">
+          <div class="disc-info">
+            <span class="disc-title-text">The City Below My Window — Apartment Recordings from Bangkok</span>
+            <span class="disc-year-text">2026</span>
+          </div>
+          <iframe class="disc-player" style="border:0;width:100%;height:42px;" src="https://bandcamp.com/EmbeddedPlayer/album=4115236374/size=small/bgcol=ffffff/linkcol=333333/artwork=none/transparent=true/" seamless><a href="https://amalayar.bandcamp.com/album/the-city-below-my-window-apartment-recordings-from-bangkok">The City Below My Window - Apartment Recordings from Bangkok by Sara Ramírez Márquez</a></iframe>
+        </div>
+
+        <div class="disc-card">
+          <img class="disc-cover" src="portadas/disc-lindero.jpg" alt="En el Lindero">
+          <div class="disc-info">
+            <span class="disc-title-text">En el Lindero, te escucho entre el Tiempo de Otros</span>
+            <span class="disc-year-text">2025</span>
+          </div>
+          <iframe class="disc-player" style="border:0;width:100%;height:42px;" src="https://bandcamp.com/EmbeddedPlayer/album=2079009454/size=small/bgcol=ffffff/linkcol=333333/artwork=none/transparent=true/" seamless><a href="https://amalayar.bandcamp.com/album/en-el-lindero-te-escucho-entre-el-tiempo-de-otros">En el Lindero, te escucho entre el Tiempo de Otros by Sara Ramírez Márquez</a></iframe>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- BIOGRAPHY -->
+    <div class="view" id="view-biography">
+      <div class="bio-text">
+        <p>Sara Ramírez Márquez, 2001</p>
+        <p>Composer from Bogotá. She studied Composition for Films and Media at <strong>UNIVERSIDAD DE LOS ANDES</strong> and Electroacoustic Composition at the <strong>UNIVERSITY OF BIRMINGHAM</strong>.</p>
+        <p>Her works have been performed internationally in the United Kingdom, France, Italy, Poland, Colombia, Argentina, and Thailand; and her original scores have featured in films officially selected for the <strong>BIRMINGHAM FILM FESTIVAL</strong> and the <strong>BOGOTÁ INTERNATIONAL FILM FESTIVAL</strong>.</p>
+        <p>Her interests revolve around immersive sound, environmental sound, and religious studies. Her current creative practice integrates electronic improvisation, poetry, spoken text, and multilingualism.</p>
+      </div>
+    </div>
+
+    <!-- EVENTS -->
+    <div class="view" id="view-events">
+      <div class="ev-list">
+
+        <div class="ev-row">
+          <span class="ev-date">2026</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://www.imdb.com/es/title/tt41979504/?ref_=nm_knf_t_1" target="_blank">Estreno nacional — El Juego de la Vida</a></span>
+            <span class="ev-venue">Departamento de Música · Bogotá, Colombia</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">9.05.2026</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://www.napolitotaleelettronica.it/marginale/timetable.php" target="_blank">Marginale II</a></span>
+            <span class="ev-venue">Opificio Puca · Napoli, Italia</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">2026</span>
+          <div class="ev-body">
+            <span class="ev-name">FICCI — Festival Internacional de Cine de Cartagena</span>
+            <span class="ev-venue">Cartagena, Colombia</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">17–19.04.2026</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://thai-eams.github.io/tagteams/2026/home.html" target="_blank">TagTEAMS Festival 2026</a></span>
+            <span class="ev-venue">Bangkok, Thailand</span>
+            <span class="ev-work">One Last Evening in Kashihara — selected for the TEAms Room Program</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">3.03.2026</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://am.katowice.pl/wydarzenia/miedzyuczelniany-koncert-kompozytorski-3677" target="_blank">AM-Biwalencja 2026</a></span>
+            <span class="ev-venue">Akademia Muzyczna im. Karola Szymanowskiego · Katowice, Poland</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">18.02.2026</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://electropresence.com/en/even/48009-rsu-international-symposium-of-electroacoustic-music-patrick" target="_blank">RSU International Symposium of Electroacoustic Music</a></span>
+            <span class="ev-venue">Rangsit University · Bangkok, Thailand</span>
+            <span class="ev-work">Premiere of Not the way to Manchester · Premiere of One Last Evening in Kashihara</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">28–29.01.2026</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://phauneradio.com/en/lecoute-des-mondes-avec-apnees/" target="_blank">La Semaine du Son — APNÉES x Phaune Radio</a></span>
+            <span class="ev-venue">Grenoble, France</span>
+            <span class="ev-work">In the Wake of Seven Dawns</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">5.12.2025</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://www.nuovaconsonanza.it/lo-spazio-elettroacustico-1.html" target="_blank">62nd Festival di Nuova Consonanza</a></span>
+            <span class="ev-venue">Mattatoio La Pelanda · Roma, Italia</span>
+            <span class="ev-work">Λίμνες Λήθης [ με αναμνήσεις ] — 16ch Ambisonic</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">20.11.2025</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://amalayar.bandcamp.com/album/en-el-lindero-te-escucho-entre-el-tiempo-de-otros" target="_blank">Estreno del álbum — En el Lindero, te escucho entre el Tiempo de Otros</a></span>
+            <span class="ev-venue">Bogotá, Colombia</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">20.11.2025</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://www.birminghamfilmfestival.co.uk/" target="_blank">Birmingham Film Festival</a></span>
+            <span class="ev-venue">Millennium Point · Birmingham, United Kingdom</span>
+            <span class="ev-work">The Letters, dir. Oishi Datta</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">19–20.11.2025</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://www.instagram.com/p/DQjukKOjToJ/?img_index=4" target="_blank">Cartas a Copenhague</a></span>
+            <span class="ev-venue">Teatro Libre Centro, La Calendaria · Bogotá, Colombia · 8:00pm</span>
+            <span class="ev-work">Beca de creación Bogotá Ciudad Escenario — Corta Trayectoria 2025</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">7.11.2025</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://www.gre.ac.uk/events/current-events/faculty-of-architecture,-computing-and-humanities/soundimage-festival-2025" target="_blank">SOUND/IMAGE 2025 Festival</a></span>
+            <span class="ev-venue">University of Greenwich · London, United Kingdom · 4:00pm</span>
+            <span class="ev-work">Fragility</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">25.10.2025</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://www.quaytickets.com/uobboxoffice/en-GB/shows/beastdome-%20afromerm%20-%20abi%20asisa%20+%20beast%20composers/events" target="_blank">BEASTdome — afromerm & abi asisa + BEAST Composers</a></span>
+            <span class="ev-venue">Bramall Music Building · Birmingham, United Kingdom · 19:30</span>
+            <span class="ev-work">Λίμνες Λήθης — Premiere</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">11.10.2025</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://biff.co/index.php" target="_blank">Bogotá International Film Festival</a></span>
+            <span class="ev-venue">Cinemateca de Bogotá, Sala Capital · 17:30</span>
+            <span class="ev-work">El Juego de la Vida, dir. Mario Andrés Ruiz Zuluaga — Estreno mundial</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">28.09.2025</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://www.youtube.com/watch?v=MXzWAdUEyvA" target="_blank">Estreno en YouTube — Lumbalú (2023)</a></span>
+            <span class="ev-venue">Bogotá, Colombia · 16:00–17:20 GMT-5</span>
+            <span class="ev-work">Radionovela — for Spanish speaking audience</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">26.09.2025</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://www.youtube.com/watch?v=cT49nw80RDQ" target="_blank">La Hora Acusmática</a></span>
+            <span class="ev-venue">Universidad Nacional de Córdoba · Argentina</span>
+            <span class="ev-work">Fragility</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">14.09.2025</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://apnees.wordpress.com/paysages-composes-index/" target="_blank">PAYSAGES | COMPOSÉS 2025</a></span>
+            <span class="ev-venue">Jardin des Plantes · Grenoble, France · 13:00–18:00</span>
+            <span class="ev-work">In the Wake of Seven Dawns — selected in the BINAURAL category</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">26.08.2025</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://www.instagram.com/p/DNvjDS15Mgd/" target="_blank">Audio-Visual Performance</a></span>
+            <span class="ev-venue">Chiang Mai University · Thailand</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">23.08.2025</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://www.pgvim.ac.th/en/activity/pgvis2025/" target="_blank">Wonderland — PGVIM Symposium 2025</a></span>
+            <span class="ev-venue">Princess Galyani Vadhana Institute of Music · Bangkok, Thailand</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">17.08.2025</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://www.instagram.com/p/DM19qH_pXwi/" target="_blank">The Sonic Art & Improvisation</a></span>
+            <span class="ev-venue">PoA White Box, Yellow Lane · Bangkok, Thailand · 18:30–20:00</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">24.07.2025</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://www.youtube.com/watch?v=BsoEYYWSyQk" target="_blank">SYNTHETIS — International Summer Course for Composers</a></span>
+            <span class="ev-venue">Nowy Dom Sztuki · Radziejowice, Poland</span>
+            <span class="ev-work">Innerbloom — Krzysztof Gluńka, alto saxophone · Sara Ramírez Márquez, live electronics</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">1–3.05.2025</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://beast.cal.bham.ac.uk/beast-feast-2025/" target="_blank">BEAST FEaST 2025</a></span>
+            <span class="ev-venue">University of Birmingham · Birmingham, United Kingdom</span>
+            <span class="ev-work">In the Wake of Seven Dawns — Sound Installation</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">13.03.2025</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://beast.cal.bham.ac.uk/events/minibeast-spring-2025-8/" target="_blank">mini-BEAST — Spring 2025</a></span>
+            <span class="ev-venue">Dome Room, Bramall Music Building · Birmingham, United Kingdom · 11:30–12:30</span>
+          </div>
+        </div>
+
+        <div class="ev-row">
+          <span class="ev-date">11.12.2024</span>
+          <div class="ev-body">
+            <span class="ev-name"><a href="https://beast.cal.bham.ac.uk/events/minibeast-autumn24-10/" target="_blank">mini-BEAST — Autumn 2024</a></span>
+            <span class="ev-venue">Dome Room, Bramall Music Building · Birmingham, United Kingdom · 11:30–12:30</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="view" id="view-contact">
+      <div>
+        <div class="contact-row"><span class="c-key">email</span><span class="c-val"><a href="mailto:sara.marquez1@outlook.com">sara.marquez1@outlook.com</a></span></div>
+        <div class="contact-row"><span class="c-key">soundcloud</span><span class="c-val"><a href="https://soundcloud.com/amalayar" target="_blank">soundcloud.com/amalayar</a></span></div>
+        <div class="contact-row"><span class="c-key">bandcamp</span><span class="c-val"><a href="https://amalayar.bandcamp.com" target="_blank">amalayar.bandcamp.com</a></span></div>
+      </div>
+    </div>
+
+    <!-- OTHER -->
+    <div class="view" id="view-other">
+      <div class="flow" id="flow-other"></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+/* ── OBRA DATA ── */
+var WORKS = {
+  electroacoustic: [
+    {
+      title: "Canopy",
+      detail: false  // obra no lista, no clickable
+    },
+    {
+      title: "The Third Nature",
+      detail: true,
+      cover: "portadas/portada - The Third Nature.jpg",
+      sc_url: ""
+    },
+    {
+      title: "One Last Evening in Kashihara",
+      detail: true,
+      cover: "portadas/one last evening in kashihara -cover.jpg",
+      sc_url: "https://soundcloud.com/amalayar/one-last-evening-in-kashihara",
+      bc_url: "https://amalayar.bandcamp.com/track/one-last-evening-in-kashihara",
+      cm_url: "https://audioboom.com/posts/8814675-one-last-evening-in-kashihara"
+    },
+    {
+      title: "Λίμνες Λήθης (Límnes Lḗthēs)",
+      detail: true,
+      cover: "portadas/limnes lethes - portada.jpg",
+      sc_url: "https://soundcloud.com/amalayar/limnes-lethes",
+      bc_url: "https://amalayar.bandcamp.com/track/l-mnes-l-th-s"
+    },
+    {
+      title: "In the Wake of Seven Dawns",
+      detail: true,
+      cover: "portadas/in the wake of seven dawns -portada.jpg",
+      sc_url: "https://soundcloud.com/amalayar/in-the-wake-of-seven-dawns",
+      bc_url: "https://amalayar.bandcamp.com/track/in-the-wake-of-seven-dawns"
+    },
+    {
+      title: "Fragility",
+      detail: true,
+      cover: "portadas/fragility -portada.jpg",
+      sc_url: "https://soundcloud.com/amalayar/fragility",
+      bc_url: "https://amalayar.bandcamp.com/track/fragility"
+    },
+    {
+      title: "vida contemplativa",
+      detail: true,
+      cover: "portadas/vida contemplativa -portada.jpg",
+      sc_url: "https://soundcloud.com/amalayar/vida-contemplativa",
+      bc_url: "https://amalayar.bandcamp.com/track/vida-contemplativa"
+    },
+    {
+      title: "Gilberto",
+      detail: true,
+      cover: "portadas/Gilberto -portada.jpg",
+      sc_url: "https://soundcloud.com/amalayar/gilberto",
+      bc_url: "https://amalayar.bandcamp.com/track/gilberto"
+    }
+  ],
+
+  contemporary: [
+    {
+      title: "Plegaria I",
+      detail: true,
+      score: "scores/plegaria-i.pdf",
+      blog: "https://amalayarr.blogspot.com/p/plegaria-i.html"
+    },
+    {
+      title: "Disipaciones",
+      detail: false
+    },
+    {
+      title: "Not the way to Manchester",
+      detail: true,
+      score: "scores/not-the-way-to-manchester.pdf",
+      blog: "https://amalayarr.blogspot.com/p/not-way-to-manchester-for-violin-piano.html"
+    },
+    {
+      title: "ZONAS DE BAJA SEÑAL [ poema sin cobertura ]",
+      detail: true,
+      score: "scores/zonas-de-baja-senal.pdf",
+      blog: "https://amalayarr.blogspot.com/p/zonas-de-baja-senal-poema-sin-cobertura.html"
+    },
+    {
+      title: "Innerbloom",
+      detail: true,
+      score: "scores/innerbloom.pdf",
+      video: "https://www.youtube.com/embed/BsoEYYWSyQk?si=70JaLK_hrhoY9WcY",
+      blog: "https://amalayarr.blogspot.com/p/innerbloom-2025-for-alto-saxophone-and.html"
+    },
+    {
+      title: "unidad invisible",
+      detail: true,
+      score: "scores/unidad-invisible-piano.pdf",
+      score2: "scores/unidad-invisible-arrangement.pdf",
+      score2_note: "arr. Dhorn Tartan Taksinwarajan",
+      blog: "https://amalayarr.blogspot.com/p/unidad-invisible-2024-for-piano-and.html"
+    },
+    {
+      title: "Suite sobre un Lirio",
+      detail: true,
+      score: "",
+      blog: "https://amalayarr.blogspot.com/p/suite-sobre-un-lirio-2023-for-ensamble.html"
+    },
+    {
+      title: "Amor Eterno",
+      detail: true,
+      score: "",
+      blog: "https://amalayarr.blogspot.com/p/amor-eterno-2022-for-solo-quartet.html"
+    }
+  ],
+
+  film: [
+    {
+      title: "The Letters",
+      detail: true,
+      cover: "portadas/the-letters.jpg",
+      year: "2025",
+      imdb: "https://www.imdb.com/es/title/tt40500502/"
+    },
+    {
+      title: "El Juego de la Vida",
+      detail: true,
+      cover: "portadas/el-juego-de-la-vida.jpg",
+      year: "2026",
+      imdb: "https://www.imdb.com/es/title/tt41979504/?ref_=nm_knf_c_1"
+    }
+  ],
+
+  other: [
+    { title: "Instagram",         direct: true,  link: "https://www.instagram.com/amalayar_/" },
+    { title: "Goodreads",         direct: true,  link: "https://www.goodreads.com/user/show/158085177-sara" },
+    { title: "Letterboxd",        direct: true,  link: "https://letterboxd.com/amalayar_/" },
+    { title: "Radionovela",       detail: true,  type: "video", yt: "https://www.youtube.com/embed/MXzWAdUEyvA?si=ye2Hz2xx9WgJ_J1w" },
+    { title: "Diffusion",         detail: true,  type: "video", yt: "https://www.youtube.com/embed/xYb-NXBAgD8?si=GkhD08mHiNT_AK3o" },
+    { title: "Installations",     detail: true,  type: "video", yt: "https://www.youtube.com/embed/nAeEsvh-tlc?si=9wOe-EnYktom_tXT" },
+    { title: "Ink & Coordinates", detail: true,  type: "map" }
+  ]
+};
+
+/* ── RENDER: film (con detalle) ── */
+function renderFilm() {
+  var el = document.getElementById('flow-film');
+  var items = WORKS.film;
+  var html = '';
+  items.forEach(function(item, i) {
+    if (i > 0) html += '<span class="flow-sep">·</span>';
+    html += '<span class="flow-item clickable" data-section="film" data-idx="' + i + '">' + item.title + '</span>';
+  });
+  el.innerHTML = html;
+  el.querySelectorAll('.flow-item.clickable').forEach(function(el) {
+    el.addEventListener('click', function() {
+      openDetail(this.dataset.section, parseInt(this.dataset.idx));
+    });
+  });
+}
+
+/* ── RENDER: contemporary (con detalle) ── */
+function renderContemporary() {
+  var el = document.getElementById('flow-contemporary');
+  var items = WORKS.contemporary;
+  var html = '';
+  items.forEach(function(item, i) {
+    if (i > 0) html += '<span class="flow-sep">·</span>';
+    if (!item.detail) {
+      html += '<span class="flow-item">' + item.title + '</span>';
+    } else {
+      html += '<span class="flow-item clickable" data-section="contemporary" data-idx="' + i + '">' + item.title + '</span>';
+    }
+  });
+  el.innerHTML = html;
+  el.querySelectorAll('.flow-item.clickable').forEach(function(el) {
+    el.addEventListener('click', function() {
+      openDetail(this.dataset.section, parseInt(this.dataset.idx));
+    });
+  });
+}
+
+/* ── RENDER: electroacoustic (con detalle) ── */
+function renderElectroacoustic() {
+  var el = document.getElementById('flow-electroacoustic');
+  var items = WORKS.electroacoustic;
+  var html = '';
+  items.forEach(function(item, i) {
+    if (i > 0) html += '<span class="flow-sep">·</span>';
+    if (!item.detail) {
+      html += '<span class="flow-item">' + item.title + '</span>';
+    } else {
+      html += '<span class="flow-item clickable" data-section="electroacoustic" data-idx="' + i + '">' + item.title + '</span>';
+    }
+  });
+  el.innerHTML = html;
+  el.querySelectorAll('.flow-item.clickable').forEach(function(el) {
+    el.addEventListener('click', function() {
+      openDetail(this.dataset.section, parseInt(this.dataset.idx));
+    });
+  });
+}
+
+/* ── DETAIL ── */
+var _fromSection = 'electroacoustic';
+
+function openDetail(section, idx) {
+  var w = WORKS[section][idx];
+  _fromSection = section;
+
+  document.getElementById('detail-title').textContent = w.title;
+
+  var coverEl = document.getElementById('detail-cover');
+  if (w.cover) {
+    coverEl.src = w.cover;
+    coverEl.alt = w.title;
+    coverEl.style.display = 'block';
+  } else {
+    coverEl.style.display = 'none';
+  }
+
+  var embedEl = document.getElementById('detail-embed');
+  var html = '';
+
+  // Electroacoustic: SoundCloud + Bandcamp links
+  if (section === 'electroacoustic') {
+    var links = '';
+    if (w.sc_url) links += '<a class="detail-sc-link" href="' + w.sc_url + '" target="_blank">SoundCloud</a>';
+    if (w.bc_url) links += '<a class="detail-sc-link" href="' + w.bc_url + '" target="_blank">Bandcamp</a>';
+    if (w.cm_url) links += '<a class="detail-sc-link" href="' + w.cm_url + '" target="_blank">Cities and Memory</a>';
+    if (links) html = '<div class="detail-links">' + links + '</div>';
+  }
+
+  // Film: cover + IMDB link + year
+  if (section === 'film') {
+    var row = '';
+    if (w.imdb) row += '<a class="detail-sc-link" href="' + w.imdb + '" target="_blank">IMDb</a>';
+    if (w.year) row += '<span class="detail-film-year">' + w.year + '</span>';
+    if (row) html = '<div class="detail-links" style="flex-direction:row;align-items:baseline;gap:1rem">' + row + '</div>';
+  }
+  if (section === 'contemporary') {
+    if (w.score) {
+      html = '<div class="pdf-wrap"><iframe class="pdf-viewer" src="' + w.score + '" title="' + w.title + '"></iframe></div>';
+    }
+    if (w.score2) {
+      html += '<p class="detail-score-note">' + (w.score2_note || '') + '</p>';
+      html += '<div class="pdf-wrap"><iframe class="pdf-viewer" src="' + w.score2 + '" title="' + w.title + ' — arr."></iframe></div>';
+    }
+    if (w.video) {
+      html += '<div class="video-wrap" style="margin-top:2rem"><iframe src="' + w.video + '" title="' + w.title + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>';
+    }
+  }
+
+  // Other: video or map
+  if (section === 'other') {
+    if (w.type === 'video') {
+      html = '<div class="video-wrap"><iframe src="' + w.yt + '" title="' + w.title + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>';
+    }
+    if (w.type === 'map') {
+      html = '<div class="map-wrap" id="leaflet-container"></div>';
+    }
+  }
+
+  embedEl.innerHTML = html;
+
+  // Init Leaflet after DOM is set
+  if (section === 'other' && w.type === 'map') {
+    setTimeout(function() {
+      if (_leafletMap) { _leafletMap.remove(); _leafletMap = null; }
+      var map = L.map('leaflet-container', {zoomControl: true, scrollWheelZoom: false}).setView([20, 10], 2);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap &copy; CARTO', maxZoom: 19
+      }).addTo(map);
+      var dot = L.circleMarker.bind(L);
+      PLACES.forEach(function(p) {
+        dot([p.lat, p.lng], {
+          radius: 4, fillColor: '#111', color: '#111',
+          weight: 1, opacity: 1, fillOpacity: 0.85
+        }).bindTooltip(p.name + ' · ' + p.country, {direction:'top', offset:[0,-4]}).addTo(map);
+      });
+      _leafletMap = map;
+    }, 50);
+  }
+
+  document.querySelectorAll('.view').forEach(function(v){ v.style.display='none'; v.classList.remove('active'); });
+  var det = document.getElementById('view-detail');
+  det.style.display = 'block'; det.classList.add('active');
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
+document.getElementById('detail-back').addEventListener('click', function() {
+  document.querySelectorAll('.view').forEach(function(v){ v.style.display='none'; v.classList.remove('active'); });
+  var back = document.getElementById('view-' + _fromSection);
+  if (back) { back.style.display='block'; back.classList.add('active'); }
+  updateNav(_fromSection);
+  updateContentPadding(_fromSection);
+});
+
+/* ── RENDER: other ── */
+function renderOther() {
+  var el = document.getElementById('flow-other');
+  var items = WORKS.other;
+  var html = '';
+  items.forEach(function(item, i) {
+    if (i > 0) html += '<span class="flow-sep">·</span>';
+    if (item.direct) {
+      html += '<span class="flow-item"><a href="' + item.link + '" target="_blank">' + item.title + '</a></span>';
+    } else {
+      html += '<span class="flow-item clickable" data-section="other" data-idx="' + i + '">' + item.title + '</span>';
+    }
+  });
+  el.innerHTML = html;
+  el.querySelectorAll('.flow-item.clickable').forEach(function(el) {
+    el.addEventListener('click', function() {
+      openDetail('other', parseInt(this.dataset.idx));
+    });
+  });
+}
+
+/* ── PLACES for Ink & Coordinates ── */
+var PLACES = [
+  {name:'Bangkok',            country:'Thailand',        lat:13.7563, lng:100.5018},
+  {name:'Chiang Mai',         country:'Thailand',        lat:18.7883, lng:98.9853},
+  {name:'Warszawa',           country:'Poland',          lat:52.2297, lng:21.0122},
+  {name:'Radziejowice',       country:'Poland',          lat:51.9,    lng:20.25},
+  {name:'Liverpool',          country:'United Kingdom',  lat:53.4084, lng:-2.9916},
+  {name:'Chester',            country:'United Kingdom',  lat:53.1905, lng:-2.8910},
+  {name:'Manchester',         country:'United Kingdom',  lat:53.4808, lng:-2.2426},
+  {name:'Bath',               country:'United Kingdom',  lat:51.3811, lng:-2.3590},
+  {name:'Bristol',            country:'United Kingdom',  lat:51.4545, lng:-2.5879},
+  {name:'Cardiff',            country:'United Kingdom',  lat:51.4816, lng:-3.1791},
+  {name:'York',               country:'United Kingdom',  lat:53.9600, lng:-1.0873},
+  {name:'Birmingham',         country:'United Kingdom',  lat:52.4862, lng:-1.8904},
+  {name:'Bogotá',             country:'Colombia',        lat:4.7110,  lng:-74.0721},
+  {name:'Medellín',           country:'Colombia',        lat:6.2442,  lng:-75.5812},
+  {name:'Fusa',               country:'Colombia',        lat:4.3456,  lng:-74.3590},
+  {name:'Leticia (Amazonia)', country:'Colombia',        lat:-4.2153, lng:-69.9406},
+  {name:'Mocagua',            country:'Colombia',        lat:-3.83,   lng:-70.24},
+  {name:'Puerto Nariño',      country:'Colombia',        lat:-2.8942, lng:-67.9244},
+  {name:'Manizales',          country:'Colombia',        lat:5.0703,  lng:-75.5138},
+  {name:'Salento',            country:'Colombia',        lat:4.6381,  lng:-75.5706},
+  {name:'Pereira',            country:'Colombia',        lat:4.8133,  lng:-75.6961},
+  {name:'Nevado de Santa Isabel', country:'Colombia',   lat:4.80,    lng:-75.35},
+  {name:'Cartagena',          country:'Colombia',        lat:10.3910, lng:-75.4794},
+  {name:'Santa Marta',        country:'Colombia',        lat:11.2408, lng:-74.1990},
+  {name:'Willemstad',         country:'Curaçao',         lat:12.1224, lng:-68.8824},
+  {name:'Santa Rosa',         country:'Perú',            lat:-4.06,   lng:-70.02},
+  {name:'Ramon Castilla',     country:'Perú',            lat:-3.9,    lng:-70.4},
+  {name:'Tabatinga',          country:'Brasil',          lat:-4.2550, lng:-69.9380},
+  {name:'Barcelona',          country:'España',          lat:41.3851, lng:2.1734},
+  {name:'Madrid',             country:'España',          lat:40.4168, lng:-3.7038},
+  {name:'Paris',              country:'France',          lat:48.8566, lng:2.3522},
+  {name:'Venezia',            country:'Italy',           lat:45.4408, lng:12.3155},
+  {name:'Roma',               country:'Italy',           lat:41.9028, lng:12.4964},
+  {name:'Κως (Kos)',          country:'Greece',          lat:36.8937, lng:27.2877},
+  {name:'Αθήνα (Athens)',     country:'Greece',          lat:37.9838, lng:23.7275},
+  {name:'Ankara',             country:'Türkiye',         lat:39.9334, lng:32.8597},
+  {name:'İstanbul',           country:'Türkiye',         lat:41.0082, lng:28.9784},
+  {name:'Bodrum',             country:'Türkiye',         lat:37.0344, lng:27.4305},
+  {name:'Dubai',              country:'UAE',             lat:25.2048, lng:55.2708}
+];
+
+var _leafletMap = null;
+
+function buildPlacesList() {
+  var countries = {};
+  PLACES.forEach(function(p) {
+    if (!countries[p.country]) countries[p.country] = [];
+    countries[p.country].push(p.name);
+  });
+  var html = '<div class="map-places">';
+  Object.keys(countries).forEach(function(c) {
+    html += '<span class="map-country">' + c + '</span>';
+    countries[c].forEach(function(city) { html += city + '<br>'; });
+  });
+  return html + '</div>';
+}
+
+/* ── NAV ── */
+function updateContentPadding(id) {
+  var btn = document.querySelector('nav button[onclick="show(\'' + id + '\')"]');
+  var aside = document.querySelector('aside');
+  var content = document.querySelector('.content');
+  if (btn && aside && content) {
+    var asideTop = aside.getBoundingClientRect().top;
+    var btnTop = btn.getBoundingClientRect().top;
+    content.style.paddingTop = (btnTop - asideTop) + 'px';
+  }
+}
+
+function updateNav(id) {
+  document.querySelectorAll('nav button').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('nav button').forEach(function(b){
+    if (b.getAttribute('onclick') === "show('" + id + "')") b.classList.add('active');
+  });
+}
+
+function show(id) {
+  document.querySelectorAll('.view').forEach(function(v){
+    v.classList.remove('active');
+    v.style.display = 'none';
+  });
+  var v = document.getElementById('view-' + id);
+  if (v) { v.classList.add('active'); v.style.display = 'block'; }
+  updateNav(id);
+  updateContentPadding(id);
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
+/* ── INIT ── */
+renderElectroacoustic();
+renderContemporary();
+renderFilm();
+renderOther();
+</script>
+</body>
+</html>
