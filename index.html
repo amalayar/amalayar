@@ -27,7 +27,6 @@ nav button.active{opacity:1;font-weight:700}
 .content{}
 .view{display:none}
 .view.active{display:block}
-
 /* ── FLOWING TITLES ── */
 .flow{line-height:1.9}
 .flow-item{display:inline;font-size:var(--sz);font-weight:400;color:#111}
@@ -36,7 +35,6 @@ nav button.active{opacity:1;font-weight:700}
 .flow-item a{color:#111;text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s}
 .flow-item a:hover{border-bottom-color:#aaa}
 .flow-sep{display:inline;color:#ccc;margin:0 .6rem;user-select:none}
-
 /* ── DETAIL PAGE ── */
 #view-detail{animation:rise .35s ease both}
 .detail-back{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:#999;background:none;border:none;padding:0;cursor:pointer;margin-bottom:3rem;display:inline-flex;align-items:center;gap:.5rem;transition:color .15s}
@@ -61,17 +59,24 @@ nav button.active{opacity:1;font-weight:700}
 .ev-name a:hover{border-bottom-color:#888}
 .ev-venue{font-size:11.5px;color:#888;line-height:1.4}
 .ev-work{font-size:11.5px;color:#555;line-height:1.4}
-.map-wrap{width:100%;max-width:700px;height:55vh;margin-top:1rem}
+.map-wrap{width:100%;max-width:700px;height:clamp(320px,55vh,560px);margin-top:1rem;border:1px solid #e8e8e8}
 .map-places{margin-top:2rem;max-width:700px;columns:2;gap:3rem;font-size:12px;color:#555;line-height:1.9}
 .map-country{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#111;font-weight:700;display:block;margin-top:1.2rem}
 .map-country:first-child{margin-top:0}
+.map-stats{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#999;margin-top:.6rem}
+/* ── LEAFLET, MINIMAL THEME ── */
+.leaflet-control-zoom{border:none!important;box-shadow:none!important}
+.leaflet-control-zoom a{background:#fff;border:1px solid #e8e8e8!important;color:#111;font-family:var(--ff);font-weight:400;border-radius:0!important;box-shadow:none!important;width:26px;height:26px;line-height:26px!important}
+.leaflet-control-zoom a:hover{background:#f7f7f5}
+.leaflet-control-attribution{background:transparent!important;font-family:var(--ff);font-size:10px;color:#aaa}
+.leaflet-control-attribution a{color:#aaa}
+.leaflet-tooltip.place-tip{font-family:var(--ff);font-size:11px;color:#111;background:#fff;border:1px solid #e8e8e8;border-radius:0;box-shadow:none;padding:.3rem .55rem;letter-spacing:.01em}
+.leaflet-tooltip.place-tip::before{display:none}
 .pdf-viewer{display:block;width:100%;height:78vh;border:none}
 .detail-sc-link{font-size:var(--sz);font-weight:700;color:#111;text-decoration:none;border-bottom:1px solid #ccc;transition:border-color .15s;display:inline-block}
 .detail-sc-link:hover{border-bottom-color:#111}
 .detail-links{display:flex;flex-direction:column;align-items:flex-start;gap:.5rem;margin-top:.5rem}
-
 @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-
 /* ── DISCOGRAPHY GALLERY ── */
 .disc-gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:3rem;max-width:780px}
 .disc-card{display:flex;flex-direction:column;gap:.9rem}
@@ -81,26 +86,22 @@ nav button.active{opacity:1;font-weight:700}
 .disc-year-text{font-size:11.5px;color:#999}
 .disc-player{border:0;width:100%;height:42px;display:block}
 @media(max-width:600px){.disc-gallery{grid-template-columns:1fr;gap:2.5rem}}
-
 /* ── BIOGRAPHY ── */
 .bio-text{max-width:540px;line-height:1.85;color:#222}
 .bio-text p+p{margin-top:1.2rem}
-
 /* ── CONTACT ── */
 .contact-row{display:flex;gap:2.5rem;padding:.5rem 0;line-height:1.6;border-bottom:1px solid #eee}
 .contact-row:first-child{border-top:1px solid #eee}
 .c-key{color:#999;min-width:110px;font-size:12px;padding-top:.15rem}
 .c-val a{color:#111;text-decoration:none;border-bottom:1px solid #ddd;transition:border-color .15s}
 .c-val a:hover{border-bottom-color:#888}
-
 /* ── MOBILE ── */
 @media(max-width:680px){:root{--left:130px;--gap:2rem}.site{padding:2rem 1.5rem}}
-@media(max-width:480px){.site{grid-template-columns:1fr;gap:0}aside{margin-bottom:2rem}nav{flex-direction:row;flex-wrap:wrap;gap:.4rem 1.2rem}.site-name{margin-bottom:1rem}}
+@media(max-width:480px){.site{grid-template-columns:1fr;gap:0}aside{margin-bottom:2rem}nav{flex-direction:row;flex-wrap:wrap;gap:.4rem 1.2rem}.site-name{margin-bottom:1rem}.content{padding-top:0!important}.map-places{columns:1}}
 </style>
 </head>
 <body>
 <div class="site">
-
   <aside>
     <div class="site-name" onclick="show('electroacoustic')">sara ramírez<br>márquez</div>
     <nav>
@@ -114,14 +115,11 @@ nav button.active{opacity:1;font-weight:700}
       <button onclick="show('other')">other</button>
     </nav>
   </aside>
-
   <main class="content">
-
     <!-- ELECTROACOUSTIC -->
     <div class="view" id="view-electroacoustic">
       <div class="flow" id="flow-electroacoustic"></div>
     </div>
-
     <!-- DETAIL (subpágina de obra) -->
     <div class="view" id="view-detail">
       <button class="detail-back" id="detail-back">Back</button>
@@ -129,21 +127,17 @@ nav button.active{opacity:1;font-weight:700}
       <img class="detail-cover" id="detail-cover" src="" alt="" style="display:none">
       <div class="detail-embed-wrap" id="detail-embed"></div>
     </div>
-
     <!-- CONTEMPORARY -->
     <div class="view" id="view-contemporary">
       <div class="flow" id="flow-contemporary"></div>
     </div>
-
     <!-- FILM -->
     <div class="view" id="view-film">
       <div class="flow" id="flow-film"></div>
     </div>
-
     <!-- DISCOGRAPHY -->
     <div class="view" id="view-discography">
       <div class="disc-gallery">
-
         <div class="disc-card">
           <img class="disc-cover" src="portadas/disc-bangkok.jpg" alt="The City Below My Window">
           <div class="disc-info">
@@ -152,7 +146,6 @@ nav button.active{opacity:1;font-weight:700}
           </div>
           <iframe class="disc-player" style="border:0;width:100%;height:42px;" src="https://bandcamp.com/EmbeddedPlayer/album=4115236374/size=small/bgcol=ffffff/linkcol=333333/artwork=none/transparent=true/" seamless><a href="https://amalayar.bandcamp.com/album/the-city-below-my-window-apartment-recordings-from-bangkok">The City Below My Window - Apartment Recordings from Bangkok by Sara Ramírez Márquez</a></iframe>
         </div>
-
         <div class="disc-card">
           <img class="disc-cover" src="portadas/disc-lindero.jpg" alt="En el Lindero">
           <div class="disc-info">
@@ -161,37 +154,33 @@ nav button.active{opacity:1;font-weight:700}
           </div>
           <iframe class="disc-player" style="border:0;width:100%;height:42px;" src="https://bandcamp.com/EmbeddedPlayer/album=2079009454/size=small/bgcol=ffffff/linkcol=333333/artwork=none/transparent=true/" seamless><a href="https://amalayar.bandcamp.com/album/en-el-lindero-te-escucho-entre-el-tiempo-de-otros">En el Lindero, te escucho entre el Tiempo de Otros by Sara Ramírez Márquez</a></iframe>
         </div>
-
       </div>
     </div>
-
     <!-- BIOGRAPHY -->
     <div class="view" id="view-biography">
       <div class="bio-text">
         <p>Sara Ramírez Márquez, 2001</p>
-        <p>Composer from Bogotá.</p> 
+        <p>Composer from Bogotá.</p>
         <p>She studied Composition for Films and Media at <strong>UNIVERSIDAD DE LOS ANDES</strong> and Electroacoustic Composition at the <strong>UNIVERSITY OF BIRMINGHAM</strong>.</p>
         <p>Her works have been performed internationally in the United Kingdom, France, Italy, Poland, Colombia, Argentina, and Thailand; and her original scores have featured in films officially selected for the <strong>BIRMINGHAM FILM FESTIVAL</strong> and the <strong>BOGOTÁ INTERNATIONAL FILM FESTIVAL</strong>.</p>
         <p>Her interests revolve around immersive sound, environmental sound, and religious studies. Her current creative practice integrates electronic improvisation, poetry, spoken text, and multilingualism.</p>
         <div style="height: 40px;"></div>
-        <p>CV available upon request via email.</p> 
+        <p>CV available upon request via email.</p>
         <div style="height: 80px;"></div>
         <section style="font-size: 0.9rem;">
-          <p>"I am a person of many passions. Beyond music, I am deeply interested in literature, writing, languages, fashion, sculpture, art, beauty, and theology. Somehow, the paths I have taken throughout my life led me to study composition professionally, and it was there that I found an extraordinarily expansive space in which all of my questions could coexist. Composition became a place where different forms of knowledge, sensitivity, and curiosity could meet.</p> 
-          <p>In my music, I seek to bring together all the things that interest me. For this reason, I often engage with themes related to spiritual inquiry, biblical texts, language, and sound ecology. The latter offers me a particular way of relating to the external world, to nature, and to realities that extend far beyond my own experience. Although I am not especially inclined towards outdoor activities, I have come to understand that contemplating creation is one of the deepest ways of drawing closer to God. Field recording and attentive listening to the environment have therefore become important practices within both my artistic and spiritual life.</p> 
-          <p>Over time, I have come to understand that composition is not, for me, a form of personal expression in the conventional sense. It resembles carpentry more than self-expression: a patient and careful labour that allows me to enter states of deep concentration and contemplation. To create is to participate in God’s creative nature; to be made in His image is also to be made to create. In this sense, composing is a form of attention. It is the time I devote to observing, reflecting, and attempting to better understand the existence of God and His influence on my own life.</p> 
-          <p>During the years in which I completed my undergraduate studies and later pursued a Master’s degree abroad, I began to feel increasingly burdened by certain dynamics of contemporary life. Social media, constantly overstimulating environments, and the persistent concern with reputation, success, and personal growth led me to question many of the conventions that structure everyday life. Gradually, I felt the need to distance myself from some of them.</p> 
-          <p>Today, I try to devote my time to reading, learning new languages, and studying disciplines that broaden my understanding of the world. I am particularly interested in theology and philosophy, as well as questions concerning the future of younger generations of artists. I often reflect on what it means to live a good life, how to cultivate both intellect and spirit, and how to draw closer to God in the midst of a fast-moving and noisy world.</p> 
-          <p>I like to think that the world is not as broken as it sometimes appears. Nevertheless, I believe it is necessary to maintain a certain distance from the things that fragment our attention in order to nourish ourselves, continue growing, and care for what truly matters. My artistic practice emerges from this desire to seek meaning, silence, and contemplation.</p> 
-          <p>Perhaps that is why, despite being an electroacoustic composer, my favourite moment of the day remains the one in which everything falls silent."</p> 
+          <p>"I am a person of many passions. Beyond music, I am deeply interested in literature, writing, languages, fashion, sculpture, art, beauty, and theology. Somehow, the paths I have taken throughout my life led me to study composition professionally, and it was there that I found an extraordinarily expansive space in which all of my questions could coexist. Composition became a place where different forms of knowledge, sensitivity, and curiosity could meet.</p>
+          <p>In my music, I seek to bring together all the things that interest me. For this reason, I often engage with themes related to spiritual inquiry, biblical texts, language, and sound ecology. The latter offers me a particular way of relating to the external world, to nature, and to realities that extend far beyond my own experience. Although I am not especially inclined towards outdoor activities, I have come to understand that contemplating creation is one of the deepest ways of drawing closer to God. Field recording and attentive listening to the environment have therefore become important practices within both my artistic and spiritual life.</p>
+          <p>Over time, I have come to understand that composition is not, for me, a form of personal expression in the conventional sense. It resembles carpentry more than self-expression: a patient and careful labour that allows me to enter states of deep concentration and contemplation. To create is to participate in God's creative nature; to be made in His image is also to be made to create. In this sense, composing is a form of attention. It is the time I devote to observing, reflecting, and attempting to better understand the existence of God and His influence on my own life.</p>
+          <p>During the years in which I completed my undergraduate studies and later pursued a Master's degree abroad, I began to feel increasingly burdened by certain dynamics of contemporary life. Social media, constantly overstimulating environments, and the persistent concern with reputation, success, and personal growth led me to question many of the conventions that structure everyday life. Gradually, I felt the need to distance myself from some of them.</p>
+          <p>Today, I try to devote my time to reading, learning new languages, and studying disciplines that broaden my understanding of the world. I am particularly interested in theology and philosophy, as well as questions concerning the future of younger generations of artists. I often reflect on what it means to live a good life, how to cultivate both intellect and spirit, and how to draw closer to God in the midst of a fast-moving and noisy world.</p>
+          <p>I like to think that the world is not as broken as it sometimes appears. Nevertheless, I believe it is necessary to maintain a certain distance from the things that fragment our attention in order to nourish ourselves, continue growing, and care for what truly matters. My artistic practice emerges from this desire to seek meaning, silence, and contemplation.</p>
+          <p>Perhaps that is why, despite being an electroacoustic composer, my favourite moment of the day remains the one in which everything falls silent."</p>
           </section>
       </div>
     </div>
-
     <!-- EVENTS -->
     <div class="view" id="view-events">
       <div class="ev-list">
-
         <div class="ev-row">
           <span class="ev-date">12-14.10.2026</span>
           <div class="ev-body">
@@ -200,7 +189,7 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">One Last Evening in Kashihara</span>
           </div>
         </div>
-        
+
         <div class="ev-row">
           <span class="ev-date">26.09.2026</span>
           <div class="ev-body">
@@ -209,7 +198,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">One Last Evening in Kashihara</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">18-20.09.2026</span>
           <div class="ev-body">
@@ -218,7 +206,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">One Last Evening in Kashihara</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">20.08.2026</span>
           <div class="ev-body">
@@ -227,7 +214,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">Innerbloom, for Alto Saxophone, fixed media and live electronics</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">01.08.2026</span>
           <div class="ev-body">
@@ -236,7 +222,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">One Last Evening in Kashihara</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">31.07.2026</span>
           <div class="ev-body">
@@ -245,7 +230,7 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">Ranas en Naguata</span>
           </div>
         </div>
-        
+
         <div class="ev-row">
           <span class="ev-date">22-23.07.2026</span>
           <div class="ev-body">
@@ -254,7 +239,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">Performance</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">15.06.2026</span>
           <div class="ev-body">
@@ -263,7 +247,7 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">𓂃 ོ☼𓂃 另一个破碎的梦（关于鸟）𓂃 ོ𓂃 (Another Broken Dream (about birds))</span>
           </div>
         </div>
-        
+
         <div class="ev-row">
           <span class="ev-date">06.06.2026</span>
           <div class="ev-body">
@@ -271,7 +255,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-venue">Madrid, España</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">9.05.2026</span>
           <div class="ev-body">
@@ -280,7 +263,7 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">One Last Evening in Kashihara</span>
           </div>
         </div>
-        
+
         <div class="ev-row">
           <span class="ev-date">05.05.2026</span>
           <div class="ev-body">
@@ -288,7 +271,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-venue">Departamento de Música · Bogotá, Colombia</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">17–19.04.2026</span>
           <div class="ev-body">
@@ -297,7 +279,7 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">One Last Evening in Kashihara — selected for the TEAms Room Program</span>
           </div>
         </div>
-        
+
         <div class="ev-row">
           <span class="ev-date">14-19.04.2026</span>
           <div class="ev-body">
@@ -305,7 +287,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-venue">Cartagena, Colombia</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">3.03.2026</span>
           <div class="ev-body">
@@ -314,7 +295,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">Not the way to Manchester</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">18.02.2026</span>
           <div class="ev-body">
@@ -323,7 +303,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">Premiere of One Last Evening in Kashihara</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">28–29.01.2026</span>
           <div class="ev-body">
@@ -332,7 +311,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">In the Wake of Seven Dawns</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">5.12.2025</span>
           <div class="ev-body">
@@ -341,7 +319,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">Λίμνες Λήθης [ με αναμνήσεις ] — 16ch Ambisonic</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">20.11.2025</span>
           <div class="ev-body">
@@ -349,7 +326,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-venue">Bogotá, Colombia</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">20.11.2025</span>
           <div class="ev-body">
@@ -358,7 +334,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">The Letters, dir. Oishi Datta</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">19–20.11.2025</span>
           <div class="ev-body">
@@ -367,7 +342,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">Beca de creación Bogotá Ciudad Escenario — Corta Trayectoria 2025</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">7.11.2025</span>
           <div class="ev-body">
@@ -376,7 +350,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">Fragility</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">25.10.2025</span>
           <div class="ev-body">
@@ -385,7 +358,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">Λίμνες Λήθης — Premiere</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">11.10.2025</span>
           <div class="ev-body">
@@ -394,7 +366,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">El Juego de la Vida, dir. Mario Andrés Ruiz Zuluaga — Estreno mundial</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">28.09.2025</span>
           <div class="ev-body">
@@ -403,7 +374,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">Radionovela — for Spanish speaking audience</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">26.09.2025</span>
           <div class="ev-body">
@@ -412,7 +382,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">Fragility</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">14.09.2025</span>
           <div class="ev-body">
@@ -421,7 +390,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">In the Wake of Seven Dawns — selected in the BINAURAL category</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">26.08.2025</span>
           <div class="ev-body">
@@ -429,7 +397,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-venue">Chiang Mai University · Thailand</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">23.08.2025</span>
           <div class="ev-body">
@@ -437,7 +404,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-venue">Princess Galyani Vadhana Institute of Music · Bangkok, Thailand</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">17.08.2025</span>
           <div class="ev-body">
@@ -445,7 +411,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-venue">PoA White Box, Yellow Lane · Bangkok, Thailand · 18:30–20:00</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">24.07.2025</span>
           <div class="ev-body">
@@ -454,7 +419,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">Innerbloom — Krzysztof Gluńka, alto saxophone · Sara Ramírez Márquez, live electronics</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">1–3.05.2025</span>
           <div class="ev-body">
@@ -463,7 +427,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-work">In the Wake of Seven Dawns — Sound Installation</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">13.03.2025</span>
           <div class="ev-body">
@@ -471,7 +434,6 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-venue">Dome Room, Bramall Music Building · Birmingham, United Kingdom · 11:30–12:30</span>
           </div>
         </div>
-
         <div class="ev-row">
           <span class="ev-date">11.12.2024</span>
           <div class="ev-body">
@@ -479,10 +441,8 @@ nav button.active{opacity:1;font-weight:700}
             <span class="ev-venue">Dome Room, Bramall Music Building · Birmingham, United Kingdom · 11:30–12:30</span>
           </div>
         </div>
-
       </div>
     </div>
-
     <!-- CONTACT -->
     <div class="view" id="view-contact">
       <div>
@@ -491,15 +451,12 @@ nav button.active{opacity:1;font-weight:700}
         <div class="contact-row"><span class="c-key">bandcamp</span><span class="c-val"><a href="https://amalayar.bandcamp.com" target="_blank">amalayar.bandcamp.com</a></span></div>
       </div>
     </div>
-
     <!-- OTHER -->
     <div class="view" id="view-other">
       <div class="flow" id="flow-other"></div>
     </div>
-
   </main>
 </div>
-
 <script>
 /* ── OBRA DATA ── */
 var WORKS = {
@@ -563,7 +520,6 @@ var WORKS = {
       bc_url: "https://amalayar.bandcamp.com/track/gilberto"
     }
   ],
-
   contemporary: [
     {
       title: "Plegaria I",
@@ -615,7 +571,6 @@ var WORKS = {
       blog: "https://amalayarr.blogspot.com/p/amor-eterno-2022-for-solo-quartet.html"
     }
   ],
-
   film: [
     {
       title: "The Letters",
@@ -632,7 +587,6 @@ var WORKS = {
       imdb: "https://www.imdb.com/es/title/tt41979504/?ref_=nm_knf_c_1"
     }
   ],
-
   other: [
     { title: "Instagram",         direct: true,  link: "https://www.instagram.com/amalayar_/" },
     { title: "Goodreads",         direct: true,  link: "https://www.goodreads.com/user/show/158085177-sara" },
@@ -643,7 +597,6 @@ var WORKS = {
     { title: "Ink & Coordinates", detail: true,  type: "map" }
   ]
 };
-
 /* ── RENDER: film (con detalle) ── */
 function renderFilm() {
   var el = document.getElementById('flow-film');
@@ -660,7 +613,6 @@ function renderFilm() {
     });
   });
 }
-
 /* ── RENDER: contemporary (con detalle) ── */
 function renderContemporary() {
   var el = document.getElementById('flow-contemporary');
@@ -681,7 +633,6 @@ function renderContemporary() {
     });
   });
 }
-
 /* ── RENDER: electroacoustic (con detalle) ── */
 function renderElectroacoustic() {
   var el = document.getElementById('flow-electroacoustic');
@@ -702,16 +653,12 @@ function renderElectroacoustic() {
     });
   });
 }
-
 /* ── DETAIL ── */
 var _fromSection = 'electroacoustic';
-
 function openDetail(section, idx) {
   var w = WORKS[section][idx];
   _fromSection = section;
-
   document.getElementById('detail-title').textContent = w.title;
-
   var coverEl = document.getElementById('detail-cover');
   if (w.cover) {
     coverEl.src = '/amalayar/' + w.cover;
@@ -720,10 +667,8 @@ function openDetail(section, idx) {
   } else {
     coverEl.style.display = 'none';
   }
-
   var embedEl = document.getElementById('detail-embed');
   var html = '';
-
   // Electroacoustic: SoundCloud + Bandcamp links
   if (section === 'electroacoustic') {
     var links = '';
@@ -732,7 +677,6 @@ function openDetail(section, idx) {
     if (w.cm_url) links += '<a class="detail-sc-link" href="' + w.cm_url + '" target="_blank">Cities and Memory</a>';
     if (links) html = '<div class="detail-links">' + links + '</div>';
   }
-
   // Film: cover + IMDB link + year
   if (section === 'film') {
     var row = '';
@@ -752,52 +696,58 @@ function openDetail(section, idx) {
       html += '<div class="video-wrap" style="margin-top:2rem"><iframe src="' + w.video + '" title="' + w.title + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>';
     }
   }
-
   // Other: video or map
   if (section === 'other') {
     if (w.type === 'video') {
       html = '<div class="video-wrap"><iframe src="' + w.yt + '" title="' + w.title + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>';
     }
     if (w.type === 'map') {
-      html = '<div class="map-wrap" id="leaflet-container"></div>';
+      var countries = {};
+      PLACES.forEach(function(p){ countries[p.country] = true; });
+      var nCountries = Object.keys(countries).length;
+      html = '<div class="map-wrap" id="leaflet-container"></div>' +
+             '<div class="map-stats">' + PLACES.length + ' places · ' + nCountries + ' countries</div>' +
+             buildPlacesList();
     }
   }
-
   embedEl.innerHTML = html;
-
   // Init Leaflet after DOM is set
   if (section === 'other' && w.type === 'map') {
     setTimeout(function() {
       if (_leafletMap) { _leafletMap.remove(); _leafletMap = null; }
-      var map = L.map('leaflet-container', {zoomControl: true, scrollWheelZoom: false}).setView([20, 10], 2);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      var map = L.map('leaflet-container', {zoomControl: true, scrollWheelZoom: false}).setView([15, 0], 2);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OpenStreetMap &copy; CARTO', maxZoom: 19
       }).addTo(map);
-      var dot = L.circleMarker.bind(L);
+      var bounds = [];
       PLACES.forEach(function(p) {
-        dot([p.lat, p.lng], {
-          radius: 4, fillColor: '#111', color: '#111',
-          weight: 1, opacity: 1, fillOpacity: 0.85
-        }).bindTooltip(p.name + ' · ' + p.country, {direction:'top', offset:[0,-4]}).addTo(map);
+        bounds.push([p.lat, p.lng]);
+        var marker = L.circleMarker([p.lat, p.lng], {
+          radius: 3.5, fillColor: '#111', color: '#111',
+          weight: 1, opacity: 0.9, fillOpacity: 0.75
+        }).bindTooltip(p.name + ' · ' + p.country, {direction:'top', offset:[0,-6], className:'place-tip'});
+        marker.on('mouseover', function(){ this.setStyle({radius:6, fillOpacity:1}); });
+        marker.on('mouseout', function(){ this.setStyle({radius:3.5, fillOpacity:0.75}); });
+        marker.addTo(map);
       });
+      if (bounds.length) map.fitBounds(bounds, {padding:[24,24], maxZoom:5});
       _leafletMap = map;
+      setTimeout(function(){ map.invalidateSize(); }, 120);
     }, 50);
   }
-
   document.querySelectorAll('.view').forEach(function(v){ v.style.display='none'; v.classList.remove('active'); });
   var det = document.getElementById('view-detail');
   det.style.display = 'block'; det.classList.add('active');
   window.scrollTo({top:0, behavior:'instant'});
 }
-
 document.getElementById('detail-back').addEventListener('click', function() {
   document.querySelectorAll('.view').forEach(function(v){ v.style.display='none'; v.classList.remove('active'); });
   var back = document.getElementById('view-' + _fromSection);
   if (back) { back.style.display='block'; back.classList.add('active'); }
+  _currentSection = _fromSection;
   updateNav(_fromSection);
   updateContentPadding(_fromSection);
 });
-
 /* ── RENDER: other ── */
 function renderOther() {
   var el = document.getElementById('flow-other');
@@ -818,7 +768,6 @@ function renderOther() {
     });
   });
 }
-
 /* ── PLACES for Ink & Coordinates ── */
 var PLACES = [
   {name:'Bangkok',            country:'Thailand',        lat:13.7563, lng:100.5018},
@@ -856,7 +805,7 @@ var PLACES = [
   {name:'Fusa',               country:'Colombia',        lat:4.3456,  lng:-74.3590},
   {name:'Leticia (Amazonia)', country:'Colombia',        lat:-4.2153, lng:-69.9406},
   {name:'Mocagua',            country:'Colombia',        lat:-3.83,   lng:-70.24},
-  {name:'Puerto Nariño',      country:'Colombia',        lat:-2.8942, lng:-67.9244},
+  {name:'Puerto Nariño',      country:'Colombia',        lat:-3.7761, lng:-70.3802},
   {name:'Manizales',          country:'Colombia',        lat:5.0703,  lng:-75.5138},
   {name:'Salento',            country:'Colombia',        lat:4.6381,  lng:-75.5706},
   {name:'Pereira',            country:'Colombia',        lat:4.8133,  lng:-75.6961},
@@ -879,9 +828,7 @@ var PLACES = [
   {name:'Bodrum',             country:'Türkiye',         lat:37.0344, lng:27.4305},
   {name:'Dubai',              country:'UAE',             lat:25.2048, lng:55.2708}
 ];
-
 var _leafletMap = null;
-
 function buildPlacesList() {
   var countries = {};
   PLACES.forEach(function(p) {
@@ -895,27 +842,35 @@ function buildPlacesList() {
   });
   return html + '</div>';
 }
-
 /* ── NAV ── */
+var _currentSection = 'electroacoustic';
 function updateContentPadding(id) {
+  var content = document.querySelector('.content');
+  if (!content) return;
+  // On the single-column mobile layout, aside sits above content, so the
+  // desktop trick of matching content's top offset to the clicked nav
+  // button's vertical position no longer applies — it used to push
+  // sections (especially the last nav item, "other") far down the page.
+  if (window.matchMedia('(max-width:480px)').matches) {
+    content.style.paddingTop = '0px';
+    return;
+  }
   var btn = document.querySelector('nav button[onclick="show(\'' + id + '\')"]');
   var aside = document.querySelector('aside');
-  var content = document.querySelector('.content');
-  if (btn && aside && content) {
+  if (btn && aside) {
     var asideTop = aside.getBoundingClientRect().top;
     var btnTop = btn.getBoundingClientRect().top;
     content.style.paddingTop = (btnTop - asideTop) + 'px';
   }
 }
-
 function updateNav(id) {
   document.querySelectorAll('nav button').forEach(function(b){ b.classList.remove('active'); });
   document.querySelectorAll('nav button').forEach(function(b){
     if (b.getAttribute('onclick') === "show('" + id + "')") b.classList.add('active');
   });
 }
-
 function show(id) {
+  _currentSection = id;
   document.querySelectorAll('.view').forEach(function(v){
     v.classList.remove('active');
     v.style.display = 'none';
@@ -926,7 +881,7 @@ function show(id) {
   updateContentPadding(id);
   window.scrollTo({top:0, behavior:'instant'});
 }
-
+window.addEventListener('resize', function(){ updateContentPadding(_currentSection); });
 /* ── INIT ── */
 renderElectroacoustic();
 renderContemporary();
