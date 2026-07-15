@@ -723,7 +723,7 @@ function openDetail(section, idx) {
       PLACES.forEach(function(p) {
         bounds.push([p.lat, p.lng]);
         var marker = L.circleMarker([p.lat, p.lng], {
-          radius: 3.5, fillColor: '#b8677d', color: '#b8677d',
+          radius: 3.5, fillColor: '#9fa9ac', color: '#9fa9ac',
           weight: 1, opacity: 0.9, fillOpacity: 0.75
         }).bindTooltip(p.name + ' · ' + p.country, {direction:'top', offset:[0,-6], className:'place-tip'});
         marker.on('mouseover', function(){ this.setStyle({radius:6, fillOpacity:1}); });
