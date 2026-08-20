@@ -545,11 +545,10 @@ nav button.active{opacity:1;font-weight:700}
 var WORKS = {
   electroacoustic: [
     {
-      title: "Untitled (2027)",
-      detail: true
-        <p>Electroacoustic piece.</p>
-        <p><strong>Commissioned by the Thai ElectroAcoustic Music Society (TEAMS) for TagTEAMS 2027, Bangkok, Thailand.</strong></p>
-    },
+  title: "Untitled (2027)",
+  detail: true,
+  note: "Electroacoustic piece.<br><strong>Commissioned by the Thai ElectroAcoustic Music Society (TEAMS) for TagTEAMS 2027, Bangkok, Thailand.</strong>"
+},
     {
       title: "De la Patria y Otros Demonios",
       detail: true
@@ -764,12 +763,13 @@ function openDetail(section, idx) {
   var html = '';
   // Electroacoustic: SoundCloud + Bandcamp links
   if (section === 'electroacoustic') {
-    var links = '';
-    if (w.sc_url) links += '<a class="detail-sc-link" href="' + w.sc_url + '" target="_blank">SoundCloud</a>';
-    if (w.bc_url) links += '<a class="detail-sc-link" href="' + w.bc_url + '" target="_blank">Bandcamp</a>';
-    if (w.cm_url) links += '<a class="detail-sc-link" href="' + w.cm_url + '" target="_blank">Cities and Memory</a>';
-    if (links) html = '<div class="detail-links">' + links + '</div>';
-  }
+  var links = '';
+  if (w.sc_url) links += '<a class="detail-sc-link" href="' + w.sc_url + '" target="_blank">SoundCloud</a>';
+  if (w.bc_url) links += '<a class="detail-sc-link" href="' + w.bc_url + '" target="_blank">Bandcamp</a>';
+  if (w.cm_url) links += '<a class="detail-sc-link" href="' + w.cm_url + '" target="_blank">Cities and Memory</a>';
+  if (links) html = '<div class="detail-links">' + links + '</div>';
+  if (w.note) html += '<p class="detail-score-note" style="margin-top:1.5rem;max-width:540px;line-height:1.7">' + w.note + '</p>';
+}
   // Film: cover + IMDB link + year
   if (section === 'film') {
     var row = '';
