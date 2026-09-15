@@ -815,6 +815,9 @@ function openDetail(section, idx) {
     if (w.video) {
       html += '<div class="video-wrap" style="margin-top:2rem"><iframe src="' + w.video + '" title="' + w.title + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>';
     }
+    if (w.note) {
+      html += '<p class="detail-score-note" style="margin-top:1.5rem;max-width:540px;line-height:1.7">' + w.note + '</p>';
+    }
   }
   // Other: video or map
   if (section === 'other') {
